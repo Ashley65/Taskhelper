@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.1)
+cmake_minimum_required(VERSION 3.16)
 project(taskHelper)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -12,6 +12,7 @@ find_package(Qt6 COMPONENTS
         Core
         Gui
         Widgets
+        Svg
         REQUIRED)
 
 
@@ -23,6 +24,10 @@ set (SOURCE_FILES
         src/UI/componets/Top_Menubar/infoBar.cpp
         src/UI/componets/Top_Menubar/NavigationBar.cpp)
 
+set (RESOURCE_FILES
+        resources/resources.qrc)
+
+
 set (HEADER_FILES
         include/UI/components/Top_Menubar/topMenubar.h
         include/UI/components/Top_Menubar/windowsAction.h
@@ -30,11 +35,14 @@ set (HEADER_FILES
         include/UI/components/Top_Menubar/InfoBar.h
         include/UI/mainWIndow.h)
 
-add_executable(taskHelper ${SOURCE_FILES} ${HEADER_FILES})
+add_executable(taskHelper ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES} )
+
+
 target_link_libraries(taskHelper PRIVATE
         Qt::Core
         Qt::Gui
         Qt::Widgets
+        Qt::Svg
 )
 
 target_include_directories(taskHelper PRIVATE
@@ -67,10 +75,24 @@ if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
                 "${QT_INSTALL_PATH}/plugins/platforms/qwindows${DEBUG_SUFFIX}.dll"
                 "$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/platforms/")
     endif ()
-    foreach (QT_LIB Core Gui Widgets)
+    foreach (QT_LIB Core Gui Widgets Svg)
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy
                 "${QT_INSTALL_PATH}/bin/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll"
                 "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
     endforeach (QT_LIB)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/iconengines/")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            "${QT_INSTALL_PATH}/plugins/iconengines/qsvgicon${DEBUG_SUFFIX}.dll"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/iconengines/")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/imageformats/")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            "${QT_INSTALL_PATH}/plugins/imageformats/qsvg${DEBUG_SUFFIX}.dll"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/imageformats/")
 endif ()
