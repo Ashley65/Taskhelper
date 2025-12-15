@@ -555,10 +555,28 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *r
                 const QPoint wndLocal = mapFromGlobal(QPoint(x, y)); // coordinates in MainWindow
                 if (topBarFrame->geometry().contains(wndLocal)) {
                     // Map the point into topBarFrame space to test against actions bar geometry
-                    const QPoint topLocal = topBarFrame->mapFrom(this, wndLocal);
-                    if (!(m_windowActionsBar && m_windowActionsBar->geometry().contains(topLocal))) {
-                        *result = HTCAPTION; // drag & Snap flyout allowed
-                        return true;
+                    const QPoint wndLocal = mapFromGlobal(QPoint(GET_X_LPARAM(msg->lParam),
+                                                             GET_Y_LPARAM(msg->lParam)));
+
+                    if (topBarFrame->geometry().contains(wndLocal)) {
+                        const QPoint topLocal = topBarFrame->mapFrom(this, wndLocal);
+
+                        const bool overActionsBar =
+                            (m_windowActionsBar &&
+                             m_windowActionsBar->geometry().contains(topLocal));
+
+                        const bool overMenuButtonBar =
+                            (m_menuButtonBar &&
+                             m_menuButtonBar->geometry().contains(topLocal));
+
+                        const bool overNavigationBar =
+                            (m_navigationBar &&
+                             m_navigationBar->geometry().contains(topLocal));
+
+                        if (!overActionsBar && !overMenuButtonBar && !overNavigationBar) {
+                            *result = HTCAPTION;   // drag & Snap flyout allowed
+                            return true;
+                        }
                     }
                 }
             }
