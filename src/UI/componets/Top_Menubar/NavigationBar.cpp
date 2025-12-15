@@ -100,6 +100,9 @@ void NavigationBar::initUi()
         "  color: #888;"
         "}";
 
+
+
+
     m_backBtn->setStyleSheet(css);
     m_forwardBtn->setStyleSheet(css);
     m_refreshBtn->setStyleSheet(css);

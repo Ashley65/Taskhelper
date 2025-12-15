@@ -24,6 +24,7 @@
 #include "components/Top_Menubar/windowsAction.h"
 #include "components/Top_Menubar/InfoBar.h"
 #include "components/Top_Menubar/NavigationBar.h"
+#include "components/Top_Menubar/MenuButtonBar.h"
 
 
 class MainWindow : public QWidget
@@ -48,6 +49,7 @@ private:
     WindowsActionsBar* m_windowActionsBar {nullptr};
     NavigationBar* m_navigationBar {nullptr};
     InfoBar* m_infoBar {nullptr};
+    MenuButtonBar* m_menuButtonBar {nullptr};
     void setupWindowActionsBar();
     void setupInfoBar();
     void setupNavigationBar();

@@ -12,6 +12,7 @@
 class QPushButton;
 class QHBoxLayout;
 
+
 class NavigationBar  : public QWidget
 {
     Q_OBJECT
@@ -24,6 +25,7 @@ private:
     QPushButton *m_backBtn;
     QPushButton *m_forwardBtn;
     QPushButton *m_refreshBtn;
+
 
 public:
     explicit NavigationBar(QWidget* parent = nullptr);

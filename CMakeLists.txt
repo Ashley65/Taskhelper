@@ -22,7 +22,8 @@ set (SOURCE_FILES
         src/UI/componets/Top_Menubar/windowsAction.cpp
         src/UI/mainWindow.cpp
         src/UI/componets/Top_Menubar/infoBar.cpp
-        src/UI/componets/Top_Menubar/NavigationBar.cpp)
+        src/UI/componets/Top_Menubar/NavigationBar.cpp
+        src/UI/componets/Top_Menubar/MenuButtonBar.cpp)
 
 set (RESOURCE_FILES
         resources/resources.qrc)
@@ -33,7 +34,8 @@ set (HEADER_FILES
         include/UI/components/Top_Menubar/windowsAction.h
         include/UI/components/Top_Menubar/NavigationBar.h
         include/UI/components/Top_Menubar/InfoBar.h
-        include/UI/mainWIndow.h)
+        include/UI/mainWIndow.h
+        include/UI/components/Top_Menubar/MenuButtonBar.h)
 
 add_executable(taskHelper ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES} )
 

@@ -160,6 +160,11 @@ MainWindow::MainWindow(QWidget* parent)
     }
     topLayout->addWidget(m_windowActionsBar, 0, 2, 2, 1, Qt::AlignRight | Qt::AlignTop);
 
+    // -- Menu_dropdown_bar ---
+    auto* menuBar = new MenuButtonBar(topBarFrame);
+    m_menuButtonBar = menuBar;
+    topLayout->addWidget(m_menuButtonBar, 2, 2, 1, 1, Qt::AlignRight | Qt::AlignVCenter);
+
 
 
     // ============================================================
