@@ -29,7 +29,8 @@ private:
 
 public:
     explicit NavigationBar(QWidget* parent = nullptr);
-
+    void setButtonStyleSheet(const QString &css);
+    void updateIcons(bool darkMode);
     void setBackEnabled(bool enabled);
     void setForwardEnabled(bool enabled);
     void setRefreshEnabled(bool enabled);

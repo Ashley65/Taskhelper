@@ -25,6 +25,7 @@ signals:
 
 public:
     explicit WindowsActionsBar(QWidget *parent = nullptr);
+    void setButtonStyleSheet(const QString &css);
 
 
 protected:

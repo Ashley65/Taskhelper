@@ -22,6 +22,48 @@ NavigationBar::NavigationBar(QWidget* parent) : QWidget(parent)
     initUi();
 }
 
+void NavigationBar::setButtonStyleSheet(const QString& css)
+{
+    if (m_backBtn)    m_backBtn->setStyleSheet(css);
+    if (m_forwardBtn) m_forwardBtn->setStyleSheet(css);
+    if (m_refreshBtn) m_refreshBtn->setStyleSheet(css);
+}
+
+void NavigationBar::updateIcons(bool darkMode)
+{
+    auto loadIcon = [darkMode](const QString &nameLight, const QString &nameDark) -> QIcon
+    {
+        const QString &name = darkMode ? nameDark : nameLight;
+        QIcon ic = QIcon::fromTheme(name);
+        if (!ic.isNull())               // if theme icon exists use it
+            return ic;
+        // otherwise load from resources
+        return QIcon(QStringLiteral(":/icons/") + name + QStringLiteral(".svg"));
+    };
+
+    if (m_backBtn)
+    {
+        m_backBtn->setIcon(loadIcon(
+            QStringLiteral("arrow_back_24dp_000000_FILL0_wght400_GRAD0_opsz24"),
+            QStringLiteral("arrow_back_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24")
+        ));
+    }
+    if (m_forwardBtn)
+    {
+        m_forwardBtn->setIcon(loadIcon(
+            QStringLiteral("arrow_forward_24dp_000000_FILL0_wght400_GRAD0_opsz24"),
+            QStringLiteral("arrow_forward_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24")
+        ));
+    }
+    if (m_refreshBtn)
+    {
+        m_refreshBtn->setIcon(loadIcon(
+            QStringLiteral("refresh_24dp_000000_FILL0_wght400_GRAD0_opsz24"),
+            QStringLiteral("refresh_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24")
+        ));
+    }
+}
+
 void NavigationBar::initUi()
 {
     m_layout = new QHBoxLayout(this);

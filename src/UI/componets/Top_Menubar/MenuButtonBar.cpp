@@ -15,6 +15,14 @@ MenuButtonBar::MenuButtonBar(QWidget *parent) : QWidget(parent)
     initUi();
 }
 
+void MenuButtonBar::setButtonStyleSheet(const QString& css)
+{
+    if (m_menuBtn)
+    {
+        m_menuBtn->setStyleSheet(css);
+    }
+}
+
 void MenuButtonBar::initUi()
 {
     auto *layout = new QHBoxLayout(this);

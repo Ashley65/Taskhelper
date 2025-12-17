@@ -13,6 +13,15 @@ WindowsActionsBar::WindowsActionsBar(QWidget* parent)
     connectSignals();
 }
 
+void WindowsActionsBar::setButtonStyleSheet(const QString& css)
+{
+    if (m_minimiseBtn) m_minimiseBtn->setStyleSheet(css);
+    if (m_maximiseBtn) m_maximiseBtn->setStyleSheet(css);
+    if (m_closeBtn)    m_closeBtn->setStyleSheet(
+        css + "QPushButton:hover { background: #ff4444; color: white; }"
+    );
+}
+
 void WindowsActionsBar::initUi()
 {
     // Layout

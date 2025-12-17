@@ -278,13 +278,67 @@ void MainWindow::setupNavigationBar()
 }
 
 void MainWindow::updateWindowTheme()
+
 {
+    const bool darkMode = isDarkModeEnabled();
+    // Update title bar and other elements based on dark mode status
+    if (auto infoBar = topBarFrame->findChild<InfoBar*>())
+    {
+        if (darkMode)
+        {
+            infoBar->setStyleSheet("background-color: #1e1e1e; color: #ffffff;");
+        }
+        else
+        {
+            infoBar->setStyleSheet("background-color: #f0f0f0; color: #000000;");
+        }
+    }
+    if (m_navigationBar)
+    {
+        const QString btnCss = darkMode
+            ? "QPushButton { padding: 0px; border: none; border-radius: 4px; }"
+              "QPushButton:hover { background: #a8c0ff; }"
+              "QPushButton:pressed { background-color: rgba(255,255,255,0.32); }"
+            : "QPushButton { padding: 0px; border: none; border-radius: 4px; }"
+              "QPushButton:hover { background: #d2e3fc; }"
+              "QPushButton:pressed { background-color: rgba(0,0,0,0.08); }";
+
+        m_navigationBar->setButtonStyleSheet(btnCss);
+        m_navigationBar->updateIcons(darkMode);
+    }
+    if (m_menuButtonBar) {
+        const QString css = darkMode
+            ? "QPushButton { padding: 0px; border: none; border-radius: 4px; }"
+              "QPushButton:hover { background: #a8c0ff; }"
+              "QPushButton:pressed { background-color: rgba(255,255,255,0.32); }"
+            : "QPushButton { padding: 0px; border: none; border-radius: 4px; }"
+              "QPushButton:hover { background: #d2e3fc; }"
+              "QPushButton:pressed { background-color: rgba(0,0,0,0.08); }";
+        m_menuButtonBar->setButtonStyleSheet(css);
+    }
+    // WindowsActionsBar
+    if (m_windowActionsBar) {
+        const QString compactCssDark =
+            "QPushButton{ padding: 0 6px; min-width: 0; min-height: 0; border: none; }"
+            "QPushButton:hover { background: #a8c0ff; }";
+
+        const QString compactCssLight =
+            "QPushButton{ padding: 0 6px; min-width: 0; min-height: 0; border: none; }"
+            "QPushButton:hover { background: #d2e3fc; }";
+
+        m_windowActionsBar->setButtonStyleSheet(
+            darkMode ? compactCssDark : compactCssLight
+        );
+    }
 }
 
 bool MainWindow::isDarkModeEnabled() const
 {
     // Implement platform-specific dark mode detection to help dected theme changes
-    const bool isDarkMode = true;
+    // Currently just a simple implementation based on palette lightness
+    const QPalette pal = qApp->palette();
+    const QColor base = pal.window().color();
+    return base.lightness() < 128;
     
 }
 
@@ -522,6 +576,11 @@ void MainWindow::changeEvent(QEvent* e)
             m_windowActionsBar->setMaximised(maximised);
         if (!maximised)
             rememberNormalGeometry();
+    }
+    else if (e->type() == QEvent::ApplicationPaletteChange ||
+             e->type() == QEvent::PaletteChange)
+    {
+        updateWindowTheme();
     }
     QWidget::changeEvent(e);
 }
