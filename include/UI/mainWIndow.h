@@ -54,6 +54,9 @@ private:
     void setupInfoBar();
     void setupNavigationBar();
 
+    void updateWindowTheme();
+    bool isDarkModeEnabled() const;
+
     enum Region {
         None       = 0,
         Left       = 1 << 0,

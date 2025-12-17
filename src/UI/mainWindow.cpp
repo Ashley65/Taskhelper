@@ -277,6 +277,17 @@ void MainWindow::setupNavigationBar()
     // The idea is to allow for the navigation bar to control navigation within the content window
 }
 
+void MainWindow::updateWindowTheme()
+{
+}
+
+bool MainWindow::isDarkModeEnabled() const
+{
+    // Implement platform-specific dark mode detection to help dected theme changes
+    const bool isDarkMode = true;
+    
+}
+
 void MainWindow::setCursorForRegion(Region r)
 {
     switch (r) {
