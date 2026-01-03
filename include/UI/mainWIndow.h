@@ -25,6 +25,7 @@
 #include "components/Top_Menubar/InfoBar.h"
 #include "components/Top_Menubar/NavigationBar.h"
 #include "components/Top_Menubar/MenuButtonBar.h"
+#include "components/SIde_Bar/sideBar.h"
 
 
 class MainWindow : public QWidget
@@ -54,8 +55,10 @@ private:
     void setupInfoBar();
     void setupNavigationBar();
 
+    void setupSideBar();
+
     void updateWindowTheme();
-    bool isDarkModeEnabled() const;
+    [[nodiscard]] bool isDarkModeEnabled() const;
 
     enum Region {
         None       = 0,
@@ -73,6 +76,8 @@ private:
     [[nodiscard]] Region hitTest(const QPoint& p) const;
 
     QFrame *topBarFrame = nullptr; // the area used for dragging (like a title bar)
+    QFrame *sideBarFrame = nullptr; // the sidebar area
+    SideBar* m_sideBar {nullptr};
     bool dragging = false;
     bool resizing = false;
     QPoint dragStartGlobal;
@@ -94,7 +99,7 @@ protected:
     void mousePressEvent(QMouseEvent *e) override;
     void mouseMoveEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
-
+    void resizeEvent(QResizeEvent* e) override;
     void leaveEvent(QEvent *e) override;
 
     void showEvent(QShowEvent *e) override;

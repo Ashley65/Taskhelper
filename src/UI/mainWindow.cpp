@@ -10,6 +10,7 @@
 #include <QTimer>
 #include <QWidget>
 #include <UI/mainWIndow.h>
+#include <UI/components/SIde_Bar/sideBar.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -62,7 +63,9 @@ MainWindow::MainWindow(QWidget* parent)
     setWindowTitle("ChronoTasks");
     resize(1000, 700);
 
-    setStyleSheet("");
+
+    // 2. Ensure the stylesheet allows transparency
+    setStyleSheet("QMainWindow { background: transparent; }");
 
     // ============================================================
     // 1. MAIN CONTAINER (.container)
@@ -74,8 +77,9 @@ MainWindow::MainWindow(QWidget* parent)
 
     // CSS: grid-template-columns: 0.2fr 1.8fr 1fr;
     // Map to integer stretches (×10): 2, 18, 10
-    mainLayout->setColumnStretch(0, 2);
-    mainLayout->setColumnStretch(1, 18);
+    // Initial stretches will be updated by resizeEvent/setupSideBar
+    mainLayout->setColumnStretch(0, 0); 
+    mainLayout->setColumnStretch(1, 14);
     mainLayout->setColumnStretch(2, 10);
 
     // CSS: grid-template-rows: 0.2fr 1.8fr 1fr;
@@ -91,7 +95,6 @@ MainWindow::MainWindow(QWidget* parent)
     // CSS: grid-area: 1 / 1 / 2 / 6; (Row 0, Col 0, Span 1, Span 3)
 
     topBarFrame = new QFrame();
-    topBarFrame->setStyleSheet("");
     mainLayout->addWidget(topBarFrame, 0, 0, 1, 3);
 
     topBarFrame->installEventFilter(this);
@@ -171,8 +174,17 @@ MainWindow::MainWindow(QWidget* parent)
     // 3. SIDE BAR (.Side_bar)
     // ============================================================
     // CSS: grid-area: 2 / 1 / 4 / 2; (Row 1, Col 0, Span 2, Span 1)
-    QFrame* sideBar = createWidget("SideBar", "#2c3e50", "", true, false);
-    mainLayout->addWidget(sideBar, 1, 0, 2, 1); // rows 1–2, col 0
+
+
+    sideBarFrame = new QFrame();
+    mainLayout->addWidget(sideBarFrame, 1, 0, 2, 1);
+
+    // now this will see a non\-null sideBarFrame
+    setupSideBar();
+
+
+
+
     // ============================================================
     // 4. CONTENT WINDOW (.Content_window)
     // ============================================================
@@ -229,6 +241,8 @@ QFrame* MainWindow::createWidget(const QString& title, const QString& color,
     layout->addWidget(label);
     return Frame;
 }
+
+
 void MainWindow::setupWindowActionsBar()
 {
     m_windowActionsBar = new WindowsActionsBar(this);
@@ -277,6 +291,66 @@ void MainWindow::setupNavigationBar()
     // The idea is to allow for the navigation bar to control navigation within the content window
 }
 
+void MainWindow::setupSideBar() {
+    if (!sideBarFrame) return;
+
+    sideBarFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+    sideBarFrame->setStyleSheet("background-color: transparent;");
+
+    auto* lay = new QVBoxLayout(sideBarFrame);
+    lay->setContentsMargins(0, 0, 0, 0); // Removed large margins around the sidebar widget
+    lay->setSpacing(0);
+
+    m_sideBar = new SideBar(sideBarFrame);
+    lay->addWidget(m_sideBar);
+    lay->addWidget(m_sideBar, 0, Qt::AlignLeft);
+    lay->setAlignment(m_sideBar, Qt::AlignLeft);
+
+    SideBar::Mode m = SideBar::Mode::Default;
+    const int w = width();
+    if (w < 800)       m = SideBar::Mode::Hidden;
+    else if (w < 1200) m = SideBar::Mode::Compact;
+    m_sideBar->setMode(m);
+
+    // Apply initial stretches based on mode
+    auto* grid = qobject_cast<QGridLayout*>(layout());
+    if (grid) {
+        if (m == SideBar::Mode::Default) {
+            grid->setColumnStretch(0, 0);
+            grid->setColumnStretch(1, 14);
+            grid->setColumnStretch(2, 10);
+        } else {
+            grid->setColumnStretch(0, 0);
+            grid->setColumnStretch(1, 14);
+            grid->setColumnStretch(2, 10);
+        }
+    }
+}
+void MainWindow::resizeEvent(QResizeEvent* e) {
+    QWidget::resizeEvent(e);
+
+    if (m_sideBar) {
+        SideBar::Mode m = SideBar::Mode::Default;
+        const int w = width();
+        if (w < 800)      m = SideBar::Mode::Hidden;
+        else if (w < 1200) m = SideBar::Mode::Compact;
+        m_sideBar->setMode(m);
+
+        // Dynamically adjust column stretches to allow scaling in Default mode
+        auto* grid = qobject_cast<QGridLayout*>(layout());
+        if (grid) {
+            if (m == SideBar::Mode::Default) {
+                grid->setColumnStretch(0, 0);  // Give sidebar 20% stretch (6/30)
+                grid->setColumnStretch(1, 14); 
+                grid->setColumnStretch(2, 10);
+            } else {
+                grid->setColumnStretch(0, 0);  // Fixed width for Compact/Hidden
+                grid->setColumnStretch(1, 14);
+                grid->setColumnStretch(2, 10);
+            }
+        }
+    }
+}
 void MainWindow::updateWindowTheme()
 
 {

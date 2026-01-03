@@ -23,7 +23,13 @@ set (SOURCE_FILES
         src/UI/mainWindow.cpp
         src/UI/componets/Top_Menubar/infoBar.cpp
         src/UI/componets/Top_Menubar/NavigationBar.cpp
-        src/UI/componets/Top_Menubar/MenuButtonBar.cpp)
+        src/UI/componets/Top_Menubar/MenuButtonBar.cpp
+        src/UI/componets/Side_Bar/sideBar.cpp
+        src/UI/componets/Side_Bar/Components/CoreNavigationSection.cpp
+        src/UI/componets/Side_Bar/Components/PrimaryActionSection.cpp
+        src/UI/componets/Side_Bar/Components/ProjectsSection.cpp
+        src/UI/componets/Side_Bar/Components/FiltersSection.cpp
+        src/UI/componets/Side_Bar/Components/FooterSection.cpp)
 
 set (RESOURCE_FILES
         resources/resources.qrc)
@@ -35,7 +41,15 @@ set (HEADER_FILES
         include/UI/components/Top_Menubar/NavigationBar.h
         include/UI/components/Top_Menubar/InfoBar.h
         include/UI/mainWIndow.h
-        include/UI/components/Top_Menubar/MenuButtonBar.h)
+        include/UI/components/Top_Menubar/MenuButtonBar.h
+        include/UI/components/SIde_Bar/sideBar.h
+        include/UI/components/SIde_Bar/componets/FooterSection.h
+        include/UI/components/SIde_Bar/componets/FiltersSection.h
+        include/UI/components/SIde_Bar/componets/ProjectsSection.h
+        include/UI/components/SIde_Bar/componets/CoreNavigationSection.h
+        include/UI/components/SIde_Bar/componets/PrimaryActionSection.h
+        include/UI/components/SIde_Bar/componets/BaseNavTree.h
+        include/UI/helpers/IconHelper.h)
 
 add_executable(taskHelper ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES} )
 

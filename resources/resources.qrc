@@ -6,5 +6,18 @@
         <file>icons/arrow_back_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.svg</file>
         <file>icons/menu_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.svg</file>
         <file>icons/refresh_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.svg</file>
+        <file>icons/inbox.svg</file>
+        <file>icons/star.svg</file>
+        <file>icons/dashboard.svg</file>
+        <file>icons/menu_open.svg</file>
+        <file>icons/calendar.svg</file>
+        <file>icons/edit_calendar.svg</file>
+        <file>icons/chevron-down.svg</file>
+        <file>icons/chevron-right.svg</file>
+        <file>icons/flag.svg</file>
+        <file>icons/folder_24dp.svg</file>
+        <file>icons/alert.svg</file>
+        <file>icons/filter.svg</file>
+        <file>icons/check.svg</file>
     </qresource>
 </RCC>
