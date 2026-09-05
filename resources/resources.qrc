@@ -53,5 +53,6 @@
         <file>icons/switch_workspace.svg</file>
         <file>icons/create_workspace.svg</file>
         <file>icons/settings.svg</file>
+        <file>icons/chronotasks_logo.svg</file>
     </qresource>
 </RCC>

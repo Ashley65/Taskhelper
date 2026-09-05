@@ -2,192 +2,455 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
-// A reusable component for the top header of the workspace
 Item {
     id: root
 
-    // Define the preferred height for the header area
     implicitHeight: mainLayout.implicitHeight
     Layout.fillWidth: true
+
+    readonly property bool isCompact: root.width < 760
+    readonly property bool isNarrowCards: root.width < 880
 
     ColumnLayout {
         id: mainLayout
         anchors.fill: parent
-        spacing: 18 // Space between the Title row and the Buttons row
+        spacing: 16
 
-
-        RowLayout {
+        // =========================================================
+        // TOP ROW: Responsive Branding / Greeting & Actions
+        // =========================================================
+        GridLayout {
             Layout.fillWidth: true
-            spacing: 5
+            columns: root.isCompact ? 1 : 2
+            rowSpacing: 12
+            columnSpacing: 16
 
-            // Workspace Title
-            Text {
-                // Binds to the C++ controller. Updates automatically if changed in C++.
-                text: typeof wsHomePage !== "undefined" ? wsHomePage.workspaceName : "Personal Workspace"
-                color: "#FFFFFF"
-                font.pixelSize: 32
-                font.bold: true
-                font.family: "Inter"
+            // --- Branding & Greeting ---
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 14
                 Layout.alignment: Qt.AlignVCenter
+
+                // ChronoTasks Logo Mark
+                Rectangle {
+                    width: 38
+                    height: 38
+                    radius: 10
+                    color: "transparent"
+
+                    Image {
+                        anchors.fill: parent
+                        source: "qrc:/icons/chronotasks_logo.svg"
+                        sourceSize.width: 38
+                        sourceSize.height: 38
+                        fillMode: Image.PreserveAspectFit
+                        smooth: true
+                    }
+                }
+
+                ColumnLayout {
+                    spacing: 2
+                    Layout.fillWidth: true
+
+                    RowLayout {
+                        spacing: 8
+                        Layout.fillWidth: true
+
+                        Text {
+                            text: "Welcome back, " + (typeof wsHomePage !== "undefined" ? wsHomePage.workspaceName : "Personal Workspace")
+                            color: "#FFFFFF"
+                            font.pixelSize: root.isCompact ? 19 : 22
+                            font.bold: true
+                            font.family: "Inter"
+                            elide: Text.ElideRight
+                            Layout.maximumWidth: root.isCompact ? root.width - 70 : 450
+                        }
+
+                        // Project badge if available
+                        Rectangle {
+                            visible: typeof wsHomePage !== "undefined" && wsHomePage.activeProjectName !== "" && wsHomePage.activeProjectName !== "General"
+                            height: 20
+                            width: activeProjText.implicitWidth + 12
+                            radius: 10
+                            color: Qt.rgba(0.55, 0.36, 0.96, 0.15)
+                            border.color: Qt.rgba(0.55, 0.36, 0.96, 0.35)
+                            border.width: 1
+
+                            Text {
+                                id: activeProjText
+                                anchors.centerIn: parent
+                                text: typeof wsHomePage !== "undefined" ? wsHomePage.activeProjectName : ""
+                                color: "#C4B5FD"
+                                font.pixelSize: 10
+                                font.weight: Font.DemiBold
+                            }
+                        }
+                    }
+
+                    // Live Date & Time Widget
+                    RowLayout {
+                        spacing: 8
+
+                        Text {
+                            id: dateTimeDisplay
+                            text: Qt.formatDateTime(new Date(), "dddd, MMMM d, yyyy | h:mm AP")
+                            color: "#94A3B8"
+                            font.pixelSize: 12
+                            font.family: "Inter"
+                        }
+
+                        Timer {
+                            interval: 10000
+                            running: true
+                            repeat: true
+                            onTriggered: {
+                                dateTimeDisplay.text = Qt.formatDateTime(new Date(), "dddd, MMMM d, yyyy | h:mm AP")
+                            }
+                        }
+                    }
+                }
             }
 
-            Text{
-                text: typeof wsHomePage !== "undefined" ? wsHomePage.activeProjectName : "Project Alpha"
-                color: "#94A3B8"
-                font.pixelSize: 16
-                font.family: "Inter"
-                Layout.alignment: Qt.AlignVCenter
+            // --- Top Action Buttons ---
+            RowLayout {
+                Layout.alignment: root.isCompact ? Qt.AlignLeft : Qt.AlignRight
+                spacing: 8
+
+                // PRIMARY BUTTON: + New Task
+                Button {
+                    id: btnNewTask
+                    text: "+ New Task"
+                    onClicked: {
+                        if (typeof wsHomePage !== "undefined") {
+                            wsHomePage.createNewTask("Untitled Task")
+                        }
+                    }
+
+                    contentItem: RowLayout {
+                        spacing: 6
+                        anchors.centerIn: parent
+                        Text {
+                            text: "+"
+                            color: "#FFFFFF"
+                            font.pixelSize: 15
+                            font.bold: true
+                        }
+                        Text {
+                            text: "New Task"
+                            color: "#FFFFFF"
+                            font.pixelSize: 12
+                            font.weight: Font.DemiBold
+                            font.family: "Inter"
+                        }
+                    }
+
+                    background: Rectangle {
+                        implicitWidth: root.isCompact ? 110 : 120
+                        implicitHeight: 36
+                        radius: 8
+                        color: btnNewTask.down ? "#6D28D9" : (btnNewTask.hovered ? "#7C3AED" : "#8B5CF6")
+                        Behavior on color { ColorAnimation { duration: 120 } }
+                    }
+                }
+
+                // SECONDARY BUTTON: + New Note
+                Button {
+                    id: btnNewNote
+                    text: "+ New Note"
+                    onClicked: {
+                        if (typeof wsHomePage !== "undefined") {
+                            wsHomePage.createNewNote("Untitled Note")
+                        }
+                    }
+
+                    contentItem: RowLayout {
+                        spacing: 6
+                        anchors.centerIn: parent
+                        Text {
+                            text: "📄"
+                            font.pixelSize: 11
+                        }
+                        Text {
+                            text: "New Note"
+                            color: "#E2E8F0"
+                            font.pixelSize: 12
+                            font.weight: Font.Medium
+                            font.family: "Inter"
+                        }
+                    }
+
+                    background: Rectangle {
+                        implicitWidth: root.isCompact ? 106 : 116
+                        implicitHeight: 36
+                        radius: 8
+                        color: btnNewNote.down ? "#161824" : (btnNewNote.hovered ? "#26293A" : "#1C1E2B")
+                        border.color: btnNewNote.hovered ? "#474D67" : "#2E3245"
+                        border.width: 1
+                        Behavior on color { ColorAnimation { duration: 120 } }
+                        Behavior on border.color { ColorAnimation { duration: 120 } }
+                    }
+                }
+
+                // SECONDARY BUTTON: Upload File
+                Button {
+                    id: btnUploadFile
+                    text: "Upload File"
+                    onClicked: {
+                        if (typeof wsHomePage !== "undefined") {
+                            wsHomePage.openUploadDialog()
+                        }
+                    }
+
+                    contentItem: RowLayout {
+                        spacing: 6
+                        anchors.centerIn: parent
+                        Text {
+                            text: "📤"
+                            font.pixelSize: 11
+                        }
+                        Text {
+                            text: "Upload"
+                            color: "#E2E8F0"
+                            font.pixelSize: 12
+                            font.weight: Font.Medium
+                            font.family: "Inter"
+                        }
+                    }
+
+                    background: Rectangle {
+                        implicitWidth: root.isCompact ? 96 : 106
+                        implicitHeight: 36
+                        radius: 8
+                        color: btnUploadFile.down ? "#161824" : (btnUploadFile.hovered ? "#26293A" : "#1C1E2B")
+                        border.color: btnUploadFile.hovered ? "#474D67" : "#2E3245"
+                        border.width: 1
+                        Behavior on color { ColorAnimation { duration: 120 } }
+                        Behavior on border.color { ColorAnimation { duration: 120 } }
+                    }
+                }
             }
-
-            // Flexible spacer to push sync status to the far right
-            // Item {
-            //     Layout.fillWidth: true
-            // }
-
-        //     // --- Sync Status Indicators ---
-        //     RowLayout {
-        //         spacing: 16
-        //         Layout.alignment: Qt.AlignVCenter
-        //
-        //         // Local SQLite Status
-        //         RowLayout {
-        //             spacing: 6
-        //             Rectangle {
-        //                 width: 10; height: 10; radius: 5
-        //                 color: "#22C55E" // Active Green
-        //             }
-        //             Text { text: "Local"; color: "#94A3B8"; font.pixelSize: 12 }
-        //         }
-        //
-        //         // LAN Sync Status
-        //         RowLayout {
-        //             spacing: 6
-        //             Rectangle {
-        //                 width: 10; height: 10; radius: 5
-        //                 color: "#3B82F6" // Active Blue
-        //
-        //                 // Subtle pulsing animation for LAN
-        //                 SequentialAnimation on opacity {
-        //                     loops: Animation.Infinite
-        //                     NumberAnimation { to: 0.4; duration: 1000 }
-        //                     NumberAnimation { to: 1.0; duration: 1000 }
-        //                 }
-        //             }
-        //             Text { text: "LAN (1 Peer)"; color: "#94A3B8"; font.pixelSize: 12 }
-        //         }
-        //
-        //         // Azure Cloud Status
-        //         RowLayout {
-        //             spacing: 6
-        //             Rectangle {
-        //                 width: 10; height: 10; radius: 5
-        //                 color: "#06B6D4" // Active Cyan
-        //             }
-        //             Text { text: "Cloud: Synced"; color: "#94A3B8"; font.pixelSize: 12 }
-        //         }
-        //     }
         }
 
-        RowLayout {
+        // =========================================================
+        // KPI SUMMARY STATS CARDS GRID (Responsive 2 or 4 Columns)
+        // =========================================================
+        GridLayout {
             Layout.fillWidth: true
-            spacing: 12
+            columns: root.isNarrowCards ? 2 : 4
+            rowSpacing: 10
+            columnSpacing: 12
 
-            // --- NEW TASK BUTTON ---
-            Button {
-                id: btnNewTask
-                text: "+  New Task"
+            // --- Card 1: Tasks Due Today ---
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 82
+                radius: 12
+                color: "#181A26"
+                border.color: Qt.rgba(1, 1, 1, 0.07)
+                border.width: 1
 
-                onClicked: {
-                    if (typeof wsHomePage !== "undefined") {
-                        wsHomePage.createNewTask("Untitled Task")
-                    } else {
-                        console.log("Mock: New Task Clicked")
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 14
+                    spacing: 12
+
+                    Rectangle {
+                        width: 40
+                        height: 40
+                        radius: 10
+                        color: Qt.rgba(0.55, 0.36, 0.96, 0.16)
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "⏱"
+                            font.pixelSize: 18
+                        }
                     }
-                }
 
-                contentItem: Text {
-                    text: btnNewTask.text
-                    color: "#E2E8F0"
-                    font.pixelSize: 14
-                    font.weight: Font.Medium
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                background: Rectangle {
-                    implicitWidth: 130
-                    implicitHeight: 40
-                    color: btnNewTask.hovered ? Qt.rgba(1, 1, 1, 0.15) : Qt.rgba(1, 1, 1, 0.05)
-                    radius: 8
-                    border.color: "#3B4048"
-                    border.width: 1
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 2
 
-                    // Smooth color transition on hover
-                    Behavior on color { ColorAnimation { duration: 150 } }
+                        Text {
+                            text: (typeof wsHomePage !== "undefined" ? wsHomePage.tasksDueTodayCount : 0) + " Tasks Today"
+                            color: "#FFFFFF"
+                            font.pixelSize: 15
+                            font.bold: true
+                            font.family: "Inter"
+                            elide: Text.ElideRight
+                            Layout.fillWidth: true
+                        }
+
+                        Text {
+                            text: typeof wsHomePage !== "undefined"
+                                ? (wsHomePage.tasksRemainingCount > 0 ? (wsHomePage.tasksRemainingCount + " remaining") : "All completed")
+                                : "0 remaining"
+                            color: "#94A3B8"
+                            font.pixelSize: 11
+                            font.family: "Inter"
+                            elide: Text.ElideRight
+                            Layout.fillWidth: true
+                        }
+                    }
                 }
             }
 
-            // --- NEW NOTE BUTTON ---
-            Button {
-                id: btnNewNote
-                text: "📄  New Note"
+            // --- Card 2: Active Projects ---
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 82
+                radius: 12
+                color: "#181A26"
+                border.color: Qt.rgba(1, 1, 1, 0.07)
+                border.width: 1
 
-                onClicked: {
-                    if (typeof wsHomePage !== "undefined") {
-                        wsHomePage.createNewNote("Untitled Note")
-                    } else {
-                        console.log("Mock: New Note Clicked")
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 14
+                    spacing: 12
+
+                    Rectangle {
+                        width: 40
+                        height: 40
+                        radius: 10
+                        color: Qt.rgba(0.23, 0.51, 0.96, 0.16)
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "📁"
+                            font.pixelSize: 18
+                        }
                     }
-                }
 
-                contentItem: Text {
-                    text: btnNewNote.text
-                    color: "#E2E8F0"
-                    font.pixelSize: 14
-                    font.weight: Font.Medium
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                background: Rectangle {
-                    implicitWidth: 130
-                    implicitHeight: 40
-                    color: btnNewNote.hovered ? Qt.rgba(1, 1, 1, 0.15) : Qt.rgba(1, 1, 1, 0.05)
-                    radius: 8
-                    border.color: "#3B4048"
-                    border.width: 1
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 2
 
-                    Behavior on color { ColorAnimation { duration: 150 } }
+                        Text {
+                            text: (typeof wsHomePage !== "undefined" ? wsHomePage.activeProjectsCount : 0) + " Projects"
+                            color: "#FFFFFF"
+                            font.pixelSize: 15
+                            font.bold: true
+                            font.family: "Inter"
+                            elide: Text.ElideRight
+                            Layout.fillWidth: true
+                        }
+
+                        Text {
+                            text: "Active in workspace"
+                            color: "#94A3B8"
+                            font.pixelSize: 11
+                            font.family: "Inter"
+                            elide: Text.ElideRight
+                            Layout.fillWidth: true
+                        }
+                    }
                 }
             }
 
-            // --- UPLOAD FILE BUTTON ---
-            Button {
-                id: btnUploadFile
-                text: "  Upload File"
+            // --- Card 3: Total Notes ---
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 82
+                radius: 12
+                color: "#181A26"
+                border.color: Qt.rgba(1, 1, 1, 0.07)
+                border.width: 1
 
-                onClicked: {
-                    if (typeof wsHomePage !== "undefined") {
-                        wsHomePage.openUploadDialog()
-                    } else {
-                        console.log("Mock: Upload File Dialog Triggered")
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 14
+                    spacing: 12
+
+                    Rectangle {
+                        width: 40
+                        height: 40
+                        radius: 10
+                        color: Qt.rgba(0.06, 0.72, 0.51, 0.16)
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "📝"
+                            font.pixelSize: 18
+                        }
+                    }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 2
+
+                        Text {
+                            text: (typeof wsHomePage !== "undefined" ? wsHomePage.totalNotesCount : 0) + " Notes"
+                            color: "#FFFFFF"
+                            font.pixelSize: 15
+                            font.bold: true
+                            font.family: "Inter"
+                            elide: Text.ElideRight
+                            Layout.fillWidth: true
+                        }
+
+                        Text {
+                            text: "Workspace library"
+                            color: "#94A3B8"
+                            font.pixelSize: 11
+                            font.family: "Inter"
+                            elide: Text.ElideRight
+                            Layout.fillWidth: true
+                        }
                     }
                 }
-                contentItem: Text {
-                    text: btnUploadFile.text
-                    color: "#E2E8F0"
-                    font.pixelSize: 14
-                    font.weight: Font.Medium
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                background: Rectangle {
-                    implicitWidth: 130
-                    implicitHeight: 40
-                    color: btnUploadFile.hovered ? Qt.rgba(1, 1, 1, 0.15) : Qt.rgba(1, 1, 1, 0.05)
-                    radius: 8
-                    border.color: "#3B4048"
-                    border.width: 1
+            }
 
-                    Behavior on color { ColorAnimation { duration: 150 } }
+            // --- Card 4: Velocity / Completion ---
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 82
+                radius: 12
+                color: "#181A26"
+                border.color: Qt.rgba(1, 1, 1, 0.07)
+                border.width: 1
+
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 14
+                    spacing: 12
+
+                    Rectangle {
+                        width: 40
+                        height: 40
+                        radius: 10
+                        color: Qt.rgba(0.96, 0.62, 0.04, 0.16)
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "⚡"
+                            font.pixelSize: 18
+                        }
+                    }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 2
+
+                        Text {
+                            text: (typeof wsHomePage !== "undefined" ? wsHomePage.completionPercentage : 0) + "% Done"
+                            color: "#FFFFFF"
+                            font.pixelSize: 15
+                            font.bold: true
+                            font.family: "Inter"
+                            elide: Text.ElideRight
+                            Layout.fillWidth: true
+                        }
+
+                        Text {
+                            text: (typeof wsHomePage !== "undefined" && wsHomePage.completionPercentage >= 80) ? "High velocity" : "In progress"
+                            color: "#94A3B8"
+                            font.pixelSize: 11
+                            font.family: "Inter"
+                            elide: Text.ElideRight
+                            Layout.fillWidth: true
+                        }
+                    }
                 }
             }
         }

@@ -1,36 +1,63 @@
 import QtQuick 2.15
+import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import "wsHomePage" as WsHome
 
-Item {
+Rectangle {
     id: root
     anchors.fill: parent
+    color: "#14151F"
 
+    readonly property bool isStacked: root.width < 700
 
-    ColumnLayout {
+    Flickable {
+        id: scrollArea
         anchors.fill: parent
-        spacing: 24
+        contentWidth: width
+        contentHeight: contentCol.implicitHeight + 48
+        clip: true
+        boundsBehavior: Flickable.StopAtBounds
 
-        WsHome.HeaderSection {
-            Layout.fillWidth: true
+        ScrollBar.vertical: ScrollBar {
+            policy: ScrollBar.AsNeeded
         }
 
-        RowLayout{
-            Layout.fillWidth: true
-            spacing: 16
+        Item {
+            width: scrollArea.width
+            height: Math.max(scrollArea.height, contentCol.implicitHeight + 48)
 
-            WsHome.RecentNotesColumn {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredHeight: 400
-            }
+            ColumnLayout {
+                id: contentCol
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: root.width < 640 ? 16 : 24
+                spacing: 18
 
-            WsHome.TaskFocusColumn {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredHeight: 400
+                WsHome.HeaderSection {
+                    Layout.fillWidth: true
+                }
+
+                GridLayout {
+                    id: columnsLayout
+                    Layout.fillWidth: true
+                    columns: root.isStacked ? 1 : 2
+                    rowSpacing: 16
+                    columnSpacing: 16
+
+                    WsHome.RecentNotesColumn {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: root.isStacked ? 340 : 440
+                        Layout.minimumHeight: 280
+                    }
+
+                    WsHome.TaskFocusColumn {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: root.isStacked ? 340 : 440
+                        Layout.minimumHeight: 280
+                    }
+                }
             }
         }
-
     }
 }

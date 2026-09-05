@@ -29,6 +29,13 @@ class wsHomePage : public IWorkspaceView
     Q_PROPERTY(QVariantList projectProgress READ projectProgress NOTIFY projectProgressChanged)
     Q_PROPERTY(QString activeProjectName READ activeProjectName NOTIFY activeProjectChanged)
 
+    // Workspace-wide KPI summary metrics
+    Q_PROPERTY(int tasksDueTodayCount READ tasksDueTodayCount NOTIFY statsChanged)
+    Q_PROPERTY(int tasksRemainingCount READ tasksRemainingCount NOTIFY statsChanged)
+    Q_PROPERTY(int activeProjectsCount READ activeProjectsCount NOTIFY statsChanged)
+    Q_PROPERTY(int totalNotesCount READ totalNotesCount NOTIFY statsChanged)
+    Q_PROPERTY(int completionPercentage READ completionPercentage NOTIFY statsChanged)
+
 public:
     explicit wsHomePage(const Workspace& ws ,WorkspaceRepository* repo ,QWidget* parent = nullptr);
     void refresh() override;
@@ -42,6 +49,8 @@ public:
     Q_INVOKABLE void requestUploadFile();
 
     Q_INVOKABLE void deleteNote(const QString& noteId);
+    Q_INVOKABLE void togglePinNote(const QString& noteId);
+    Q_INVOKABLE void deleteTask(const QString& taskId);
 
     Q_INVOKABLE void openUploadDialog();
 
@@ -56,6 +65,12 @@ public:
     QVariantList overdueTasks() const;
     QVariantList projectProgress() const;
 
+    int tasksDueTodayCount() const { return m_tasksDueTodayCount; }
+    int tasksRemainingCount() const { return m_tasksRemainingCount; }
+    int activeProjectsCount() const { return m_activeProjectsCount; }
+    int totalNotesCount() const { return m_totalNotesCount; }
+    int completionPercentage() const { return m_completionPercentage; }
+
 
 signals:
     void workspaceNameChanged();
@@ -64,6 +79,7 @@ signals:
     void overdueTasksChanged();
     void projectProgressChanged();
     void activeProjectChanged();
+    void statsChanged();
     void uploadMessage(const QString& message, bool isError);
     void noteOpenRequested(const QString& noteId);
 
@@ -82,6 +98,12 @@ private:
     QVariantList m_todayTasks;
     QVariantList m_overdueTasks;
     QVariantList m_projectProgress;
+
+    int m_tasksDueTodayCount {0};
+    int m_tasksRemainingCount {0};
+    int m_activeProjectsCount {0};
+    int m_totalNotesCount {0};
+    int m_completionPercentage {0};
 
 
     void populateData();
